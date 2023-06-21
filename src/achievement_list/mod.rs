@@ -1,6 +1,4 @@
-use std::path::PathBuf;
-
-use serde::{Deserialize, Serialize};
+use std::{path::PathBuf, io::BufRead};
 
 // const EXAMPLE_JSON: &str = r"{
 //     "SHRUG_IT_OFF": "true",
@@ -50,84 +48,42 @@ use serde::{Deserialize, Serialize};
 //     "AMETHYST": "true"
 //   }"
 
-#[derive(Debug, Deserialize, Serialize, Default)]
+#[derive(Debug, Default)]
 #[allow(non_snake_case)]
 pub struct Achievements {
-    SHRUG_IT_OFF: Option<String>,
-    GHOST_GUARDIAN: Option<String>,
-    CHAMP: Option<String>,
-    SLIME_BOSS: Option<String>,
-    GUARDIAN: Option<String>,
-    COLLECTOR: Option<String>,
-    CROW: Option<String>,
-    RUBY: Option<String>,
-    SHAPES: Option<String>,
-    EMERALD: Option<String>,
-    PLAGUE: Option<String>,
-    PERFECT: Option<String>,
-    IMPERVIOUS: Option<String>,
-    AUTOMATON: Option<String>,
-    THE_PACT: Option<String>,
-    TIME_EATER: Option<String>,
-    ADRENALINE: Option<String>,
-    POWERFUL: Option<String>,
-    COME_AT_ME: Option<String>,
-    PURITY: Option<String>,
-    NINJA: Option<String>,
-    INFINITY: Option<String>,
-    ASCEND_0: Option<String>,
-    CATALYST: Option<String>,
-    JAXXED: Option<String>,
-    SAPPHIRE: Option<String>,
-    ASCEND_10: Option<String>,
-    FOCUSED: Option<String>,
-    BARRICADED: Option<String>,
-    TRANSIENT: Option<String>,
-    YOU_ARE_NOTHING: Option<String>,
-    MINIMALIST: Option<String>,
-    SPEED_CLIMBER: Option<String>,
-    LUCKY_DAY: Option<String>,
-    ASCEND_20: Option<String>,
-    NEON: Option<String>,
-    EMERALD_PLUS: Option<String>,
-    RUBY_PLUS: Option<String>,
-    SAPPHIRE_PLUS: Option<String>,
-    THE_ENDING: Option<String>,
-    COMMON_SENSE: Option<String>,
-    ONE_RELIC: Option<String>,
-    DONUT: Option<String>,
-    ETERNAL_ONE: Option<String>,
-    AMETHYST: Option<String>,
+    values: Vec<String>
 }
 
 impl Achievements {
     pub fn from_path(path: &PathBuf) -> Result<Self, Box<dyn std::error::Error>> {
         let file = std::fs::File::open(path)?;
         let reader = std::io::BufReader::new(file);
-        let achievements = serde_json::from_reader(reader)?;
-        Ok(achievements)
+        let values = reader
+        .lines()
+        .filter_map(Result::ok)
+        .filter_map(|line| {
+            line.split_once(": ")
+            .map(|(key, _)|
+                key
+                .trim()
+                .trim_matches('"')
+                .into()
+        )})
+        .collect();
+        Ok(Self { values })
     }
 }
 
 #[cfg(test)]
 mod test_achievement_list {
-    use std::{path::Path, io::Read};
+    use std::path::PathBuf;
 
-    use super::*;
-    #[test]
-    fn test_serialize_default_list() {
-        let default_list = Achievements::default();
-        let serialized = serde_json::to_string(&default_list).unwrap();
-        dbg!(serialized);
-    }
+    use crate::achievement_list::Achievements;
 
     #[test]
     fn test_deserialize_current_achievements() {
-        let achievements = Path::new("C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire/preferences/STSAchievements");
-        let mut file = std::fs::File::open(achievements).unwrap();
-        let mut buffer = String::new();
-        file.read_to_string(&mut buffer).unwrap();
-        let deserialized: Achievements = serde_json::from_str(&buffer).unwrap();
-        dbg!(deserialized);
+        let achievements_path = PathBuf::from("C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire/preferences/STSAchievements");
+        let achievements = Achievements::from_path(&achievements_path).unwrap();
+        dbg!(achievements);
     }
 }
