@@ -59,22 +59,26 @@ impl Serialize for Settings {
         struct Inner<'a> {
             preferences: &'a str,
             save_slot: usize,
+            width: usize,
             raw_achievements: Vec<Vec<&'a str>>,
         }
 
         let Inner {
             preferences,
             save_slot,
+            width,
             raw_achievements,
         } = Inner {
             preferences: self.preferences.to_str().unwrap(),
             save_slot: self.save_slot,
+            width: self.width,
             raw_achievements: self.achievements.iter().map(|(a, b)| vec![a.as_str(), b.as_str()]).collect(),
         };
 
         Inner::serialize(&Inner {
             preferences,
             save_slot,
+            width,
             raw_achievements,
         }, serializer)
     }
