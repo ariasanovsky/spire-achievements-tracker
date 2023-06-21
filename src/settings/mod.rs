@@ -1,4 +1,4 @@
-use std::path::PathBuf;
+use std::{path::PathBuf, collections::HashMap};
 
 use crate::achievement_list::Achievements;
 
@@ -57,7 +57,9 @@ const DEFAULT_PAIRS: [(&'static str, &'static str); 45] = [
 pub struct Settings {
     pub preferences: PathBuf,
     pub save_slot: usize,
-    pub width: usize,
+    pub row_width: usize,
+    pub font_size: usize,
+    pub text_padding: usize,
     pub achievements: [(String, String); 45],
 }
 
@@ -74,6 +76,13 @@ impl Settings {
         let path = self.achievements_path();
         Achievements::from_path(&path)
     }
+
+    pub fn name_map(&self) -> HashMap<String, String> {
+        self.achievements
+        .iter()
+        .map(|(a, b)| (a.into(), b.into()))
+        .collect()
+    }
 }
 
 impl Default for Settings {
@@ -81,7 +90,9 @@ impl Default for Settings {
         Self {
             preferences: PathBuf::from("C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire/preferences"),
             save_slot: Default::default(),
-            width: 10,
+            row_width: 10,
+            font_size: 25,
+            text_padding: 4,
             achievements: DEFAULT_PAIRS
             .map(|(a, b)| (a.to_string(), b.to_string())),
         }

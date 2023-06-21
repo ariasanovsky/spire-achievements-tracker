@@ -1,5 +1,5 @@
 use core::panic;
-use std::{path::PathBuf, fs::File, io::{BufReader, BufWriter}, collections::HashMap};
+use std::{path::PathBuf, fs::File, io::{BufReader, BufWriter}, collections::HashMap, time::Instant};
 
 use spire_achievements_tracker::{settings::Settings, achievement_list::Achievements};
 
@@ -24,22 +24,22 @@ use eframe::{egui::CtxRef as EguiCtxRef, epi};
 #[derive(Default)]
 struct App {
     settings: Settings,
+    rename_map: HashMap<String, String>,
     achievements: Achievements,
-    text: Vec<String>,
 }
 
 impl epi::App for App {
-    fn update(&mut self, ctx: &egui::CtxRef, frame: &mut epi::Frame<'_>) {
-        self.text = self.settings.achievements
-        .iter()
-        .map(|(_, achievement)| {
-            format!("{achievement:?}")
-        }).collect();
+    fn update(&mut self, ctx: &egui::CtxRef, _: &mut epi::Frame<'_>) {
+        if let Ok(achievements) = self.settings.achievements() {
+            self.achievements = achievements;
+        } else {
+            return;
+        }
 
         let mut fonts = egui::FontDefinitions::default();
         fonts.family_and_size.insert(
             egui::TextStyle::Body,
-            (egui::FontFamily::Proportional, 30.0)
+            (egui::FontFamily::Proportional, self.settings.font_size as f32)
         );
 
         ctx.set_fonts(fonts);
@@ -49,35 +49,18 @@ impl epi::App for App {
             .show(ui, |ui| {
                 for (i, (achievement, _)) in self.settings.achievements
                 .iter().enumerate() {
-                    ui.colored_label(
-                        egui::Color32::from_rgb(255, 0, 0),
-                        format!("{achievement}    ")
-                    );
-                    if (i + 1) % self.settings.width == 0 {
+                    let color = if self.achievements.values.contains(achievement) {
+                        egui::Color32::from_rgb(0, 255, 0)
+                    } else {
+                        egui::Color32::from_rgb(255, 0, 0)
+                    };
+                    let text = format!("{}    ", self.rename_map.get(achievement).unwrap_or(achievement));
+                    ui.colored_label(color, text);
+                    if (i + 1) % self.settings.row_width == 0 {
                         ui.end_row();
                     }
                 }
             })
-            
-            
-            
-            // ui.horizontal_wrapped(|ui| {
-            //     ui.style_mut().spacing.item_spacing.x = 100.0; // Set horizontal spacing
-            //     ui.style_mut().spacing.item_spacing.y = 10.0; // Set vertical spacing
-                
-            //     let mut grid = egui::Grid::new("my_grid");
-            //     for 
-            //     //ui.
-            //     for text in &mut self.text {
-            //         ui.add(
-            //             TextEdit::multiline(text)
-            //             .desired_rows(1)
-            //             .desired_width(80.0)
-            //             .text_color(egui::Color32::from_rgb(255, 0, 0))
-            //         );
-            //     }
-            // }
-            // );
         });
     }
 
@@ -93,15 +76,12 @@ fn main() {
     let achievements = settings.achievements().unwrap_or_default();
     dbg!(&achievements);
     
-    let mut map = HashMap::new();
-    for (a, b) in &settings.achievements {
-        map.insert(a.clone(), b.clone());
-    }
+    let rename_map = settings.name_map();
     
     let app = App {
         settings,
+        rename_map,
         achievements,
-        text: vec![],
     };
 
     let native_options = eframe::NativeOptions::default();

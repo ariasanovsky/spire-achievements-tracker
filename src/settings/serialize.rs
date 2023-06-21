@@ -16,6 +16,8 @@ impl<'de> Deserialize<'de> for Settings {
             preferences: String,
             save_slot: usize,
             width: usize,
+            font_size: usize,
+            padding: usize,
             raw_achievements: Vec<Vec<String>>,
         }
 
@@ -23,6 +25,8 @@ impl<'de> Deserialize<'de> for Settings {
             preferences,
             save_slot,
             width,
+            font_size,
+            padding,
             mut raw_achievements,
         } = Inner::deserialize(deserializer)?;
         
@@ -44,7 +48,9 @@ impl<'de> Deserialize<'de> for Settings {
         Ok(Self {
             preferences: PathBuf::from(preferences),
             save_slot,
-            width,
+            row_width: width,
+            font_size,
+            text_padding: padding,
             achievements,
         })
     }
@@ -60,6 +66,8 @@ impl Serialize for Settings {
             preferences: &'a str,
             save_slot: usize,
             width: usize,
+            font_size: usize,
+            padding: usize,
             raw_achievements: Vec<Vec<&'a str>>,
         }
 
@@ -67,18 +75,27 @@ impl Serialize for Settings {
             preferences,
             save_slot,
             width,
+            font_size,
+            padding,
             raw_achievements,
         } = Inner {
             preferences: self.preferences.to_str().unwrap(),
             save_slot: self.save_slot,
-            width: self.width,
-            raw_achievements: self.achievements.iter().map(|(a, b)| vec![a.as_str(), b.as_str()]).collect(),
+            width: self.row_width,
+            font_size: self.font_size,
+            padding: self.text_padding,
+            raw_achievements: self.achievements.iter()
+            .map(|(a, b)|
+                vec![a.as_str(), b.as_str()])
+            .collect(),
         };
 
         Inner::serialize(&Inner {
             preferences,
             save_slot,
             width,
+            font_size,
+            padding,
             raw_achievements,
         }, serializer)
     }
@@ -86,7 +103,6 @@ impl Serialize for Settings {
 
 #[cfg(test)]
 mod test_serialize_settings {
-    use super::*;
     use crate::settings::*;
 
     #[test]
