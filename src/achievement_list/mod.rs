@@ -1,4 +1,4 @@
-use std::{io::BufRead, path::PathBuf, collections::HashSet};
+use std::{collections::HashSet, io::BufRead, path::PathBuf};
 
 // const EXAMPLE_JSON: &str = r"{
 //     "SHRUG_IT_OFF": "true",
@@ -56,15 +56,17 @@ pub struct Achievements {
 
 impl PartialOrd for Achievements {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        Some(match (
-            self.values.is_subset(&other.values),
-            self.values.is_superset(&other.values)
-        ) {
-            (true, true) => std::cmp::Ordering::Equal,
-            (true, false) => std::cmp::Ordering::Less,
-            (false, true) => std::cmp::Ordering::Greater,
-            (false, false) => return None,
-        })
+        Some(
+            match (
+                self.values.is_subset(&other.values),
+                self.values.is_superset(&other.values),
+            ) {
+                (true, true) => std::cmp::Ordering::Equal,
+                (true, false) => std::cmp::Ordering::Less,
+                (false, true) => std::cmp::Ordering::Greater,
+                (false, false) => return None,
+            },
+        )
     }
 }
 

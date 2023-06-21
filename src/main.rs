@@ -1,4 +1,3 @@
-use core::panic;
 use std::{
     collections::HashMap,
     fs::File,
@@ -77,7 +76,7 @@ impl epi::App for App {
                 Some(std::cmp::Ordering::Less) => {
                     let _ = self.play_reset_sound();
                 }
-                Some(std::cmp::Ordering::Equal) => {},
+                Some(std::cmp::Ordering::Equal) => {}
                 None => {
                     let _ = self.play_reset_sound();
                 }
@@ -132,7 +131,7 @@ impl epi::App for App {
     }
 }
 
-use rodio::{Decoder, OutputStream, source::Source};
+use rodio::{source::Source, Decoder, OutputStream};
 
 fn main() -> Result<(), Box<dyn std::error::Error>> {
     // let (_stream, stream_handle) = OutputStream::try_default()?;
@@ -143,7 +142,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     // let src = File::open("./.media/SOTE_SFX_Relic_Tingsha.ogg")?;
     // let source = Decoder::new(BufReader::new(src))?;
     // stream_handle.play_raw(source.convert_samples())?;
-    
 
     let app = App::new()?;
     let native_options = eframe::NativeOptions::default();
