@@ -1,4 +1,4 @@
-use std::{io::BufRead, path::PathBuf};
+use std::{io::BufRead, path::PathBuf, collections::HashSet};
 
 // const EXAMPLE_JSON: &str = r"{
 //     "SHRUG_IT_OFF": "true",
@@ -48,10 +48,24 @@ use std::{io::BufRead, path::PathBuf};
 //     "AMETHYST": "true"
 //   }"
 
-#[derive(Debug, Default)]
+#[derive(Debug, Default, PartialEq, Eq)]
 #[allow(non_snake_case)]
 pub struct Achievements {
-    pub values: Vec<String>,
+    pub values: HashSet<String>,
+}
+
+impl PartialOrd for Achievements {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        Some(match (
+            self.values.is_subset(&other.values),
+            self.values.is_superset(&other.values)
+        ) {
+            (true, true) => std::cmp::Ordering::Equal,
+            (true, false) => std::cmp::Ordering::Less,
+            (false, true) => std::cmp::Ordering::Greater,
+            (false, false) => return None,
+        })
+    }
 }
 
 impl Achievements {

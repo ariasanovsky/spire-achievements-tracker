@@ -1,3 +1,4 @@
+use core::panic;
 use std::{
     collections::HashMap,
     fs::File,
@@ -42,11 +43,45 @@ impl App {
             achievements,
         })
     }
+
+    fn play_reset_sound(&self) -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(path) = &self.settings.reset_sound {
+            let (_stream, stream_handle) = OutputStream::try_default()?;
+            let src = File::open(path)?;
+            let source = Decoder::new(BufReader::new(src))?;
+            stream_handle.play_raw(source.convert_samples())?;
+            std::thread::sleep(std::time::Duration::from_secs(3));
+        }
+        Ok(())
+    }
+
+    fn play_achievement_sound(&self) -> Result<(), Box<dyn std::error::Error>> {
+        if let Some(path) = &self.settings.achievement_sound {
+            let (_stream, stream_handle) = OutputStream::try_default()?;
+            let src = File::open(path)?;
+            let source = Decoder::new(BufReader::new(src))?;
+            stream_handle.play_raw(source.convert_samples())?;
+            std::thread::sleep(std::time::Duration::from_secs(3));
+        }
+        Ok(())
+    }
 }
 
 impl epi::App for App {
     fn update(&mut self, ctx: &egui::CtxRef, _: &mut epi::Frame<'_>) {
         if let Ok(achievements) = self.settings.achievements() {
+            match achievements.partial_cmp(&self.achievements) {
+                Some(std::cmp::Ordering::Greater) => {
+                    let _ = self.play_achievement_sound();
+                }
+                Some(std::cmp::Ordering::Less) => {
+                    let _ = self.play_reset_sound();
+                }
+                Some(std::cmp::Ordering::Equal) => {},
+                None => {
+                    let _ = self.play_reset_sound();
+                }
+            }
             self.achievements = achievements;
         } else {
             return;
@@ -97,7 +132,19 @@ impl epi::App for App {
     }
 }
 
+use rodio::{Decoder, OutputStream, source::Source};
+
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    // let (_stream, stream_handle) = OutputStream::try_default()?;
+    // let src = File::open("./.media/SOTE_SFX_Relic_Tingsha.ogg")?;
+    // let source = Decoder::new(BufReader::new(src))?;
+    // stream_handle.play_raw(source.convert_samples())?;
+    // std::thread::sleep(std::time::Duration::from_secs(5));
+    // let src = File::open("./.media/SOTE_SFX_Relic_Tingsha.ogg")?;
+    // let source = Decoder::new(BufReader::new(src))?;
+    // stream_handle.play_raw(source.convert_samples())?;
+    
+
     let app = App::new()?;
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(Box::new(app), native_options);

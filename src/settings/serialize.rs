@@ -18,6 +18,8 @@ impl<'de> Deserialize<'de> for Settings {
             width: usize,
             font_size: usize,
             padding: usize,
+            reset_sound: Option<PathBuf>,
+            achievement_sound: Option<PathBuf>,
             raw_achievements: Vec<Vec<String>>,
         }
 
@@ -26,7 +28,9 @@ impl<'de> Deserialize<'de> for Settings {
             save_slot,
             width,
             font_size,
-            padding,
+            padding: text_padding,
+            reset_sound,
+            achievement_sound,
             mut raw_achievements,
         } = Inner::deserialize(deserializer)?;
 
@@ -47,7 +51,9 @@ impl<'de> Deserialize<'de> for Settings {
             save_slot,
             row_width: width,
             font_size,
-            text_padding: padding,
+            text_padding,
+            reset_sound,
+            achievement_sound,
             achievements,
         })
     }
@@ -65,6 +71,8 @@ impl Serialize for Settings {
             width: usize,
             font_size: usize,
             padding: usize,
+            reset_sound: Option<&'a PathBuf>,
+            achievement_sound: Option<&'a PathBuf>,
             raw_achievements: Vec<Vec<&'a str>>,
         }
 
@@ -74,6 +82,8 @@ impl Serialize for Settings {
             width,
             font_size,
             padding,
+            reset_sound,
+            achievement_sound,
             raw_achievements,
         } = Inner {
             preferences: self.preferences.to_str().unwrap(),
@@ -81,6 +91,8 @@ impl Serialize for Settings {
             width: self.row_width,
             font_size: self.font_size,
             padding: self.text_padding,
+            reset_sound: self.reset_sound.as_ref(),
+            achievement_sound: self.achievement_sound.as_ref(),
             raw_achievements: self
                 .achievements
                 .iter()
@@ -95,6 +107,8 @@ impl Serialize for Settings {
                 width,
                 font_size,
                 padding,
+                reset_sound,
+                achievement_sound,
                 raw_achievements,
             },
             serializer,

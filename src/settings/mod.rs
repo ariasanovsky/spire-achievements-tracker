@@ -59,6 +59,8 @@ pub struct Settings {
     pub row_width: usize,
     pub font_size: usize,
     pub text_padding: usize,
+    pub reset_sound: Option<PathBuf>,
+    pub achievement_sound: Option<PathBuf>,
     pub achievements: [(String, String); 45],
 }
 
@@ -93,6 +95,8 @@ impl Default for Settings {
             row_width: 10,
             font_size: 25,
             text_padding: 4,
+            reset_sound: None,
+            achievement_sound: None,
             achievements: DEFAULT_PAIRS.map(|(a, b)| (a.to_string(), b.to_string())),
         }
     }
