@@ -51,7 +51,7 @@ use std::{path::PathBuf, io::BufRead};
 #[derive(Debug, Default)]
 #[allow(non_snake_case)]
 pub struct Achievements {
-    values: Vec<String>
+    pub values: Vec<String>
 }
 
 impl Achievements {
