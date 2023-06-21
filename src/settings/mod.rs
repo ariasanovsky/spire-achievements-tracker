@@ -55,10 +55,10 @@ const DEFAULT_PAIRS: [(&'static str, &'static str); 45] = [
 
 #[derive(Debug)]
 pub struct Settings {
-    preferences: PathBuf,
-    save_slot: usize,
-    width: usize,
-    achievements: [(String, String); 45],
+    pub preferences: PathBuf,
+    pub save_slot: usize,
+    pub width: usize,
+    pub achievements: [(String, String); 45],
 }
 
 impl Settings {
