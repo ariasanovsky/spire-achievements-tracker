@@ -4,7 +4,7 @@ use crate::achievement_list::Achievements;
 
 mod serialize;
 
-const DEFAULT_PAIRS: [(&'static str, &'static str); 45] = [
+const DEFAULT_PAIRS: [(&str, &str); 45] = [
     ("ADRENALINE", "Adrenaline"),
     ("AMETHYST", "Amethyst"),
     ("AMETHYST_PLUS", "Amethyst+"),

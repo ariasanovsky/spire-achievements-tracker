@@ -1,10 +1,8 @@
-use core::panic;
 use std::{
     collections::HashMap,
     fs::File,
     io::{BufReader, BufWriter},
     path::PathBuf,
-    time::Instant,
 };
 
 use spire_achievements_tracker::{achievement_list::Achievements, settings::Settings};
@@ -24,8 +22,7 @@ fn settings() -> Result<Settings, Box<dyn std::error::Error>> {
     }
 }
 
-use eframe::{egui::CtxRef as EguiCtxRef, epi};
-use egui::{Align2, CentralPanel, CtxRef, Grid, Label, TextEdit, Ui, Window};
+use eframe::epi;
 
 #[derive(Default)]
 struct App {
