@@ -61,8 +61,9 @@ impl epi::App for App {
                         egui::Color32::from_rgb(255, 0, 0)
                     };
                     let text = format!(
-                        "{}    ",
-                        self.rename_map.get(achievement).unwrap_or(achievement)
+                        "{}{}",
+                        self.rename_map.get(achievement).unwrap_or(achievement),
+                        " ".repeat(self.settings.text_padding)
                     );
                     ui.colored_label(color, text);
                     if (i + 1) % self.settings.row_width == 0 {
