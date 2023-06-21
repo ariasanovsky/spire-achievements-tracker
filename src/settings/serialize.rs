@@ -29,21 +29,18 @@ impl<'de> Deserialize<'de> for Settings {
             padding,
             mut raw_achievements,
         } = Inner::deserialize(deserializer)?;
-        
+
         let pairs: Vec<(String, String)> = raw_achievements
-        .drain(..)
-        .filter_map(|mut raw_pair| {
-            let mut pair = raw_pair.drain(..2);
-            Some((pair.next()?, pair.next()?))
-        })
-        .collect();
+            .drain(..)
+            .filter_map(|mut raw_pair| {
+                let mut pair = raw_pair.drain(..2);
+                Some((pair.next()?, pair.next()?))
+            })
+            .collect();
 
         let achievements: [(String, String); 45] = pairs
-        .try_into()
-        .unwrap_or(
-            DEFAULT_PAIRS
-            .map(|(a, b)| (a.into(), b.into()))
-        );
+            .try_into()
+            .unwrap_or(DEFAULT_PAIRS.map(|(a, b)| (a.into(), b.into())));
 
         Ok(Self {
             preferences: PathBuf::from(preferences),
@@ -59,7 +56,7 @@ impl<'de> Deserialize<'de> for Settings {
 impl Serialize for Settings {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
     where
-        S: serde::Serializer
+        S: serde::Serializer,
     {
         #[derive(Serialize)]
         struct Inner<'a> {
@@ -84,20 +81,24 @@ impl Serialize for Settings {
             width: self.row_width,
             font_size: self.font_size,
             padding: self.text_padding,
-            raw_achievements: self.achievements.iter()
-            .map(|(a, b)|
-                vec![a.as_str(), b.as_str()])
-            .collect(),
+            raw_achievements: self
+                .achievements
+                .iter()
+                .map(|(a, b)| vec![a.as_str(), b.as_str()])
+                .collect(),
         };
 
-        Inner::serialize(&Inner {
-            preferences,
-            save_slot,
-            width,
-            font_size,
-            padding,
-            raw_achievements,
-        }, serializer)
+        Inner::serialize(
+            &Inner {
+                preferences,
+                save_slot,
+                width,
+                font_size,
+                padding,
+                raw_achievements,
+            },
+            serializer,
+        )
     }
 }
 

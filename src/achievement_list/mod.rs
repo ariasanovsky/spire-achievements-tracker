@@ -1,4 +1,4 @@
-use std::{path::PathBuf, io::BufRead};
+use std::{io::BufRead, path::PathBuf};
 
 // const EXAMPLE_JSON: &str = r"{
 //     "SHRUG_IT_OFF": "true",
@@ -51,7 +51,7 @@ use std::{path::PathBuf, io::BufRead};
 #[derive(Debug, Default)]
 #[allow(non_snake_case)]
 pub struct Achievements {
-    pub values: Vec<String>
+    pub values: Vec<String>,
 }
 
 impl Achievements {
@@ -59,17 +59,13 @@ impl Achievements {
         let file = std::fs::File::open(path)?;
         let reader = std::io::BufReader::new(file);
         let values = reader
-        .lines()
-        .filter_map(Result::ok)
-        .filter_map(|line| {
-            line.split_once(": ")
-            .map(|(key, _)|
-                key
-                .trim()
-                .trim_matches('"')
-                .into()
-        )})
-        .collect();
+            .lines()
+            .filter_map(Result::ok)
+            .filter_map(|line| {
+                line.split_once(": ")
+                    .map(|(key, _)| key.trim().trim_matches('"').into())
+            })
+            .collect();
         Ok(Self { values })
     }
 }

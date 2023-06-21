@@ -1,4 +1,4 @@
-use std::{path::PathBuf, collections::HashMap};
+use std::{collections::HashMap, path::PathBuf};
 
 use crate::achievement_list::Achievements;
 
@@ -49,9 +49,8 @@ const DEFAULT_PAIRS: [(&'static str, &'static str); 45] = [
     ("THE_PACT", "The Pact"),
     ("THE_TRANSIENT", "The Transient"),
     ("TIME_EATER", "The Time Eater"),
-    ("YOU_ARE_NOTHING", "You Are Nothing")
+    ("YOU_ARE_NOTHING", "You Are Nothing"),
 ];
-
 
 #[derive(Debug)]
 pub struct Settings {
@@ -65,8 +64,7 @@ pub struct Settings {
 
 impl Settings {
     fn achievements_path(&self) -> PathBuf {
-        self.preferences
-        .join(match self.save_slot {
+        self.preferences.join(match self.save_slot {
             0 => "STSAchievements".to_string(),
             i => format!("{i}_STSAchievements"),
         })
@@ -79,22 +77,23 @@ impl Settings {
 
     pub fn name_map(&self) -> HashMap<String, String> {
         self.achievements
-        .iter()
-        .map(|(a, b)| (a.into(), b.into()))
-        .collect()
+            .iter()
+            .map(|(a, b)| (a.into(), b.into()))
+            .collect()
     }
 }
 
 impl Default for Settings {
     fn default() -> Self {
         Self {
-            preferences: PathBuf::from("C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire/preferences"),
+            preferences: PathBuf::from(
+                "C:/Program Files (x86)/Steam/steamapps/common/SlayTheSpire/preferences",
+            ),
             save_slot: Default::default(),
             row_width: 10,
             font_size: 25,
             text_padding: 4,
-            achievements: DEFAULT_PAIRS
-            .map(|(a, b)| (a.to_string(), b.to_string())),
+            achievements: DEFAULT_PAIRS.map(|(a, b)| (a.to_string(), b.to_string())),
         }
     }
 }
