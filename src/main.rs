@@ -24,11 +24,24 @@ fn settings() -> Result<Settings, Box<dyn std::error::Error>> {
 
 use eframe::epi;
 
-#[derive(Default)]
 struct App {
     settings: Settings,
     rename_map: HashMap<String, String>,
     achievements: Achievements,
+}
+
+impl App {
+    fn new() -> Result<Self, Box<dyn std::error::Error>> {
+        let settings = settings()?;
+        let rename_map = settings.name_map();
+        let achievements = settings.achievements().unwrap_or_default();
+
+        Ok(Self {
+            settings,
+            rename_map,
+            achievements,
+        })
+    }
 }
 
 impl epi::App for App {
@@ -39,19 +52,8 @@ impl epi::App for App {
             return;
         }
 
-        let mut fonts = egui::FontDefinitions::default();
-        fonts.family_and_size.insert(
-            egui::TextStyle::Body,
-            (
-                egui::FontFamily::Proportional,
-                self.settings.font_size as f32,
-            ),
-        );
-
-        ctx.set_fonts(fonts);
-
         egui::CentralPanel::default().show(ctx, |ui| {
-            egui::Grid::new("my_grid").show(ui, |ui| {
+            egui::Grid::new("").show(ui, |ui| {
                 for (i, (achievement, _)) in self.settings.achievements.iter().enumerate() {
                     let color = if self.achievements.values.contains(achievement) {
                         egui::Color32::from_rgb(0, 255, 0)
@@ -74,23 +76,28 @@ impl epi::App for App {
     fn name(&self) -> &str {
         "Achievement Tracker"
     }
+
+    fn setup(
+        &mut self,
+        ctx: &egui::CtxRef,
+        _frame: &mut epi::Frame<'_>,
+        _storage: Option<&dyn epi::Storage>,
+    ) {
+        let mut fonts = egui::FontDefinitions::default();
+        fonts.family_and_size.insert(
+            egui::TextStyle::Body,
+            (
+                egui::FontFamily::Proportional,
+                self.settings.font_size as f32,
+            ),
+        );
+
+        ctx.set_fonts(fonts);
+    }
 }
 
-fn main() {
-    let settings = settings().unwrap();
-    dbg!(&settings);
-
-    let achievements = settings.achievements().unwrap_or_default();
-    dbg!(&achievements);
-
-    let rename_map = settings.name_map();
-
-    let app = App {
-        settings,
-        rename_map,
-        achievements,
-    };
-
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let app = App::new()?;
     let native_options = eframe::NativeOptions::default();
     eframe::run_native(Box::new(app), native_options);
 }
