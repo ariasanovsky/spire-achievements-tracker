@@ -1,6 +1,6 @@
 [package]
 name = "spire-achievements-tracker"
-version = "0.1.2"
+version = "0.1.3"
 edition = "2021"
 description = "A GUI app for tracking achievements in Slay the Spire."
 license = "MIT OR Apache-2.0"
